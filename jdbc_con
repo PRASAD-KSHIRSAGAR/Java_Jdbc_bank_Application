@@ -1,0 +1,180 @@
+import java.util.*;
+import java.sql.*;
+public class jdbc_con {
+
+	public static void main(String[] args)throws SQLException{
+		
+		try
+		{
+			Scanner xyz=new Scanner(System.in);
+			com.mysql.cj.jdbc.Driver jd=new com.mysql.cj.jdbc.Driver();
+			DriverManager.registerDriver(jd);
+			Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/jdbc","root","manager");
+			if(con!=null)
+			{
+				while(true)
+				{	
+					System.out.println("Database Connected Sucessfully..");
+				
+					System.out.println("1: Add New Customer to bank");
+					System.out.println("2: Deposit money");
+					System.out.println("3: Withdraw Money");
+					System.out.println("4: Check Balance");
+					System.out.println("5: Update Customer");
+					System.out.println("6: Delete Customer");
+				
+				
+					System.out.println("Enter Your choice");
+					int choice=xyz.nextInt();
+					switch(choice)
+					{
+						case 1:
+							System.out.println("Enter the Details----->:\n");
+							System.out.println("Enter the Account No:");
+							int ACC_no=xyz.nextInt();
+							System.out.println("Enter the Name:");
+							xyz.nextLine();
+							String Name=xyz.nextLine();
+							System.out.println("Enter the Email:");
+							String Email=xyz.nextLine();
+							System.out.println("Enter the Adress:");
+							String Address=xyz.nextLine();
+							System.out.println("Enter the Balance:");
+							int Balance=xyz.nextInt();
+							Statement smt=con.createStatement();
+							int value=smt.executeUpdate("insert into Bank_custmore values("+ACC_no+",'"+Name+"','"+Email+"','"+Address+"',"+Balance+")");
+							if(value>0)
+							{
+								System.out.println("Data inserted Sucessfully");
+							}
+							else
+							{
+								System.out.println("Data not inserted");
+							}
+						break;
+						case 2:
+							System.out.println("Enter the Account No:");
+							int Account_no=xyz.nextInt();
+							System.out.println("Enter the Ammount to Deposite:");
+							int New_Ammount=xyz.nextInt();
+					
+							String select="Select Balance from Bank_custmore where Acc_no="+Account_no;
+							Statement smt2=con.createStatement();
+							ResultSet res=smt2.executeQuery(select);
+							int Depo_ammount=0;
+							if(res.next())
+							{
+								Depo_ammount=res.getInt("Balance");
+							}
+							int updated_balance=Depo_ammount+New_Ammount;
+							int up=smt2.executeUpdate("update Bank_custmore set Balance="+updated_balance+" where Acc_no="+Account_no+"");
+							if(up>0)
+							{
+								System.out.println("Ammount Deposited Sucessfully");
+							}
+							else
+							{
+								System.out.println("Not Depositied");
+							}
+						break;
+						case 3:
+							System.out.println("Enter the Account No:");
+							int Acc_no=xyz.nextInt();
+							System.out.println("Enter the Ammount to Withdraw:");
+							int New_Amm=xyz.nextInt();
+							
+							String select1="Select Balance from Bank_custmore where Acc_no="+Acc_no;
+							Statement smt3=con.createStatement();
+							ResultSet res1=smt3.executeQuery(select1);
+							int withdraw_ammount=0;
+							if(res1.next())
+							{
+								withdraw_ammount=res1.getInt("Balance");
+							}
+							int update_balance=withdraw_ammount-New_Amm;
+							int withdraw=smt3.executeUpdate("update Bank_custmore set Balance="+update_balance+" where Acc_no="+Acc_no+"");
+							if(withdraw>0)
+							{
+								System.out.println("Ammount withdraw Sucessfully");
+							}
+							else
+							{
+								System.out.println("Not Withdraw");
+							}
+					    break;
+						case 4:
+							System.out.println("Enter the Account No:");
+							int Ac_no=xyz.nextInt();
+							Statement smt4=con.createStatement();
+							ResultSet res4=smt4.executeQuery("Select Acc_no,Balance from Bank_custmore where Acc_no="+Ac_no+"");			
+					
+							while(res4.next())
+							{
+								int accNo=res4.getInt("Acc_no");
+								int Bal=res4.getInt("Balance");
+								System.out.printf("Account No: "+accNo+",Balance:"+Bal+"");
+								System.out.println("\n");
+							}
+						break;
+						case 5:
+							System.out.println("Enter data to update");
+							System.out.println("--------------------");
+					
+							System.out.println("Enter the Account No:");
+							int Acco_no=xyz.nextInt();
+							System.out.println("Enter Account Holder Name:");
+							xyz.nextLine();
+							String Acc_name=xyz.nextLine();	
+							System.out.println("Enter The Email_id:");
+							String E_mail=xyz.nextLine();
+							System.out.println("Enter The Address:");
+							String AddRess=xyz.nextLine();
+	
+							String UpdatedData="Update Bank_custmore set Acc_name='"+Acc_name+"',email='"+E_mail+"',Address='"+AddRess+"' where Acc_no="+Acco_no+"";
+							Statement smt5=con.createStatement();
+					
+							int res5=smt5.executeUpdate(UpdatedData);
+							if(res5>0)
+							{
+								System.out.println("Data Updated....");
+							}
+							else
+							{
+								System.out.println("Data !!NotUpdated");
+							}				
+						break;
+						case 6:
+							Statement smt6=con.createStatement();
+							System.out.println("Enter the Account No:");
+							int A_no=xyz.nextInt();
+							int value1=smt6.executeUpdate("Delete from Bank_custmore where Acc_no=" +A_no);
+							if(value1>0)					
+							{
+								System.out.println("Custmore Delete Sucessfully....");
+							}
+							else
+							{
+								System.out.println("Custmore Not Deleted....");
+							}											
+						break;
+						default:
+							System.out.println("Wrong Choice: "+choice);
+							con.close();
+					}								
+				}
+			}	
+			else
+			{
+				System.out.println("Database Not Connected");
+				
+			}
+			
+			con.close();
+		}	
+		catch(Exception ex)
+		{
+			System.out.println("Error is "+ex);
+		}
+	}
+
+}
